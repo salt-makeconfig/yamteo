@@ -1,0 +1,186 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>APP CONFIG</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(270deg, #000, #0f0f0f, #1a001a, #000033);
+      background-size: 800% 800%;
+      animation: gradientShift 15s ease infinite;
+      overflow: hidden;
+      font-family: 'Arial', sans-serif;
+      color: #fff;
+    }
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 0;
+    }
+    .container {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 2;
+      width: 400px;
+      background: rgba(0, 0, 0, 0.85);
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 0 350px #00ffff, 0 0 500px #ff00ff;
+      border: 5px solid #0ff;
+      animation: neonPulse 2.5s infinite alternate, shake 6s infinite ease-in-out;
+    }
+    @keyframes neonPulse {
+      0% { box-shadow: 0 0 120px #0ff; }
+      50% { box-shadow: 0 0 500px #ff00ff; }
+      100% { box-shadow: 0 0 120px #0ff; }
+    }
+    @keyframes shake {
+      0%, 100% { transform: translate(-50%, -50%) rotate(0deg); }
+      50% { transform: translate(-50%, -50%) rotate(0.7deg); }
+    }
+    .header {
+      text-align: center;
+      font-size: 36px;
+      font-weight: bold;
+      margin-bottom: 30px;
+      background: linear-gradient(45deg, #00f0ff, #ff00ff, #00ff90, #ffcc00);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: glowText 3s linear infinite;
+    }
+    @keyframes glowText {
+      0% { filter: drop-shadow(0 0 20px #00f0ff); }
+      50% { filter: drop-shadow(0 0 60px #ff00ff); }
+      100% { filter: drop-shadow(0 0 20px #00f0ff); }
+    }
+    .option {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 25px 0;
+      font-size: 24px;
+      animation: optionGlow 5s infinite alternate;
+    }
+    @keyframes optionGlow {
+      0% { color: #fff; text-shadow: 0 0 10px #0ff; }
+      50% { color: #ffccff; text-shadow: 0 0 40px #f0f; }
+      100% { color: #fff; text-shadow: 0 0 10px #0ff; }
+    }
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 70px;
+      height: 32px;
+    }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #222;
+      transition: .4s;
+      border-radius: 32px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 28px; width: 28px;
+      left: 2px; bottom: 2px;
+      background-color: #fff;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    input:checked + .slider {
+      background: linear-gradient(90deg, #0ff, #f0f);
+      box-shadow: 0 0 30px #0ff;
+    }
+    input:checked + .slider:before {
+      transform: translateX(36px);
+    }
+  </style>
+</head>
+<body>
+<canvas id="canvas"></canvas>
+<canvas id="snowCanvas"></canvas>
+<div class="container">
+  <div class="header">𝑵𝒈 𝑿𝒖𝒂𝒏 𝑺𝒂𝒏𝒈 👑</div>
+  <div class="option"><span>Aim Sniper</span><label class="switch"><input type="checkbox"><span class="slider"></span></label></div>
+  <div class="option"><span>Scope Sniper</span><label class="switch"><input type="checkbox"><span class="slider"></span></label></div>
+  <div class="option"><span>Fast Switch</span><label class="switch"><input type="checkbox"><span class="slider"></span></label></div>
+  <div class="option"><span>Magic Risk</span><label class="switch"><input type="checkbox"><span class="slider"></span></label></div>
+</div>
+<script>
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+const snowCanvas = document.getElementById("snowCanvas");
+const snowCtx = snowCanvas.getContext("2d");
+let width = window.innerWidth;
+let height = window.innerHeight;
+canvas.width = snowCanvas.width = width;
+canvas.height = snowCanvas.height = height;
+let points = [];
+for (let i = 0; i < 120; i++) {
+  points.push({x: Math.random()*width, y: Math.random()*height, vx:(Math.random()-0.5)*1.5, vy:(Math.random()-0.5)*1.5});
+}
+function animateParticles(){
+  ctx.clearRect(0,0,width,height);
+  ctx.fillStyle="#00f0ff";
+  points.forEach(p=>{
+    p.x+=p.vx; p.y+=p.vy;
+    if(p.x<0||p.x>width) p.vx*=-1;
+    if(p.y<0||p.y>height) p.vy*=-1;
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,2.5,0,Math.PI*2);
+    ctx.fill();
+  });
+  for(let i=0;i<points.length;i++){
+    for(let j=i+1;j<points.length;j++){
+      let dx=points[i].x-points[j].x, dy=points[i].y-points[j].y, dist=Math.sqrt(dx*dx+dy*dy);
+      if(dist<130){
+        ctx.strokeStyle="rgba(0,255,255,0.12)";
+        ctx.beginPath();
+        ctx.moveTo(points[i].x,points[i].y);
+        ctx.lineTo(points[j].x,points[j].y);
+        ctx.stroke();
+      }
+    }
+  }
+  requestAnimationFrame(animateParticles);
+}
+animateParticles();
+let snowflakes=[];
+for(let i=0;i<400;i++){
+  snowflakes.push({x:Math.random()*width, y:Math.random()*height, r:Math.random()*2+1.5, d:Math.random()*0.8+0.5});
+}
+function drawSnow(){
+  snowCtx.clearRect(0,0,width,height);
+  snowCtx.fillStyle="#fff";
+  snowCtx.shadowColor="#fff";
+  snowCtx.shadowBlur=15;
+  snowflakes.forEach(f=>{
+    snowCtx.beginPath();
+    snowCtx.arc(f.x,f.y,f.r,0,Math.PI*2);
+    snowCtx.fill();
+  });
+  snowflakes.forEach(f=>{
+    f.y+=f.d;
+    if(f.y>height){f.y=0;f.x=Math.random()*width;}
+  });
+  requestAnimationFrame(drawSnow);
+}
+drawSnow();
+</script>
+</body>
+</html>
+
